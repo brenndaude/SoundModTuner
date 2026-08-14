@@ -8,9 +8,12 @@ output is a drop-in replacement mod.
 
 ## Requirements
 
-- Windows PowerShell 5.1 (stock Windows 10/11)
-- [ffmpeg](https://ffmpeg.org) + ffprobe on PATH (`winget install ffmpeg`)
+- Windows 10/11 (stock Windows PowerShell 5.1 — nothing to install)
 - Your sound pack in a `Sounds` folder next to the scripts
+- Internet on first launch: if [ffmpeg](https://ffmpeg.org) isn't already
+  installed, the app downloads a portable build automatically (~170 MB, one
+  time) into a local `bin` folder — no admin rights, nothing touches your
+  system PATH. Already have ffmpeg? It's used as-is and nothing is downloaded.
 
 ## SoundModTuner.ps1 — per-category GUI
 

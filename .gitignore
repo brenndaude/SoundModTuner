@@ -4,3 +4,10 @@ Sounds_processed/
 
 # per-user state
 tuner-settings.json
+
+# auto-downloaded ffmpeg build
+bin/
+
+# local screenshots / images
+*.jpg
+*.png

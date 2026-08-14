@@ -28,6 +28,8 @@ param(
 $ErrorActionPreference = 'Continue'
 
 # --- sanity checks --------------------------------------------------------
+$bootstrap = Join-Path $PSScriptRoot "bootstrap-ffmpeg.ps1"
+if (Test-Path $bootstrap) { . $bootstrap; Initialize-FFmpeg }
 foreach ($tool in "ffmpeg", "ffprobe") {
     if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
         throw "$tool not found on PATH. Install ffmpeg first."
@@ -515,16 +517,18 @@ load();
 '@
 
 # --- server ---------------------------------------------------------------
-$listener = New-Object System.Net.HttpListener
+$listener = $null
 $boundPort = 0
 foreach ($p in $Port..($Port + 9)) {
+    # a failed Start() leaves an HttpListener unusable - fresh object per attempt
+    $attempt = New-Object System.Net.HttpListener
+    $attempt.Prefixes.Add("http://localhost:$p/")
     try {
-        $listener.Prefixes.Clear()
-        $listener.Prefixes.Add("http://localhost:$p/")
-        $listener.Start()
+        $attempt.Start()
+        $listener = $attempt
         $boundPort = $p
         break
-    } catch { }
+    } catch { $attempt.Close() }
 }
 if ($boundPort -eq 0) { throw "Could not bind a port in range $Port-$($Port+9)." }
 

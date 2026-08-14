@@ -47,6 +47,8 @@ param(
 )
 
 # --- sanity checks --------------------------------------------------------
+$bootstrap = Join-Path $PSScriptRoot "bootstrap-ffmpeg.ps1"
+if (Test-Path $bootstrap) { . $bootstrap; Initialize-FFmpeg }
 foreach ($tool in "ffmpeg", "ffprobe") {
     if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
         throw "$tool not found on PATH. Install ffmpeg first."
