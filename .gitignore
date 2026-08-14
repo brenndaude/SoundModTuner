@@ -1,0 +1,6 @@
+# sound packs (input and generated output) — not part of the repo
+Sounds/
+Sounds_processed/
+
+# per-user state
+tuner-settings.json
