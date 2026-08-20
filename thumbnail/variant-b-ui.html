@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1280px; height:720px; overflow:hidden; }
+  body {
+    background:#14161a;
+    font-family:'Archivo', Arial, sans-serif; color:#e8e6e0;
+    position:relative;
+  }
+  /* faint diagonal texture, very low contrast */
+  body::before { content:''; position:absolute; inset:0;
+    background:repeating-linear-gradient(-35deg, rgba(255,255,255,.016) 0 2px, transparent 2px 14px); }
+
+  .title { position:absolute; left:78px; top:150px; width:520px; z-index:3; }
+  .kicker { font-size:20px; letter-spacing:.38em; color:#8b8f98; font-weight:600; margin-bottom:16px; }
+  h1 { font-family:'Archivo Black','Arial Black',sans-serif; font-size:92px; line-height:.94; }
+  h1 .amber { color:#f5a524; }
+  .tag { margin-top:24px; font-size:23px; color:#b9bcc4; font-weight:500; line-height:1.45; }
+  .tag b { color:#e8e6e0; font-weight:700; }
+
+  /* ---- right: the actual product - category slider rows ---- */
+  .panel { position:absolute; right:64px; top:96px; width:520px; z-index:2;
+           transform:rotate(-2deg); }
+  .row { display:grid; grid-template-columns:170px 1fr 86px; gap:16px; align-items:center;
+         background:#1d2026; border:1px solid #2b2f37; border-radius:12px;
+         padding:20px 22px; margin-bottom:14px;
+         box-shadow:0 14px 34px rgba(0,0,0,.45); }
+  .name { font-weight:700; font-size:21px; }
+  .track { height:7px; border-radius:4px; background:#12141a; position:relative; }
+  .fill { position:absolute; left:50%; top:0; bottom:0; background:#f5a524; opacity:.55; }
+  .knob { position:absolute; top:50%; transform:translate(-50%,-50%);
+          width:24px; height:24px; border-radius:50%; background:#f5a524;
+          box-shadow:0 0 0 5px rgba(245,165,36,.16); }
+  .val { font-size:20px; font-weight:700; color:#f5a524; text-align:right;
+         font-variant-numeric:tabular-nums; }
+  .val.zero { color:#8b8f98; }
+  .baseline { position:absolute; left:0; right:0; bottom:0; height:6px; background:#f5a524; }
+</style>
+</head>
+<body>
+  <div class="title">
+    <div class="kicker">SKATER XL SOUND MOD</div>
+    <h1>SOUNDMOD<br><span class="amber">TUNER</span></h1>
+    <div class="tag">Concrete up. Rails down.<br><b>Every sound where it belongs.</b></div>
+  </div>
+
+  <div class="panel">
+    <div class="row"><div class="name">Concrete grinds</div>
+      <div class="track"><div class="fill" style="width:31%"></div><div class="knob" style="left:81%"></div></div>
+      <div class="val">+3.0 st</div></div>
+    <div class="row"><div class="name">Metal grinds</div>
+      <div class="track"><div class="fill" style="left:32%; width:18%"></div><div class="knob" style="left:32%"></div></div>
+      <div class="val">&minus;1.5 st</div></div>
+    <div class="row"><div class="name">Board lands</div>
+      <div class="track"><div class="fill" style="width:22%"></div><div class="knob" style="left:72%"></div></div>
+      <div class="val">+2.0 st</div></div>
+    <div class="row"><div class="name">Ollies</div>
+      <div class="track"><div class="fill" style="width:22%"></div><div class="knob" style="left:72%"></div></div>
+      <div class="val">+2.0 st</div></div>
+    <div class="row"><div class="name">Bearings</div>
+      <div class="track"><div class="knob" style="left:50%"></div></div>
+      <div class="val zero">0.0 st</div></div>
+  </div>
+
+  <div class="baseline"></div>
+</body>
+</html>

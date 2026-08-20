@@ -3,9 +3,14 @@
     Batch-processes a Skater XL SoundMod folder with ffmpeg.
 
 .DESCRIPTION
-    For every audio file under -Source (excluding UI and Ragdoll subfolders):
-      1. Varispeed pitch shift (-Semitones arg)   - resample-based, natural on transients
-      2. Optional peak normalize (-Normalize)     - uniform -1 dBFS ceiling, off by default
+    Applies one varispeed pitch shift (-Semitones) to every audio file under
+    -Source, excluding UI and Ragdoll subfolders. Resample-based, so it stays
+    natural on transients.
+
+    There is no loudness normalization: the game's mix relies on categories
+    sitting at deliberately different levels (bearings under rolling, and so
+    on), and flattening them destroys that. Use SoundModTuner.ps1 if you want
+    per-category level and EQ control.
 
     Originals are never modified. Output mirrors the folder structure into
     <Source>_processed. Files in excluded folders and non-audio files are
@@ -16,16 +21,13 @@
 .PARAMETER Semitones
     Pitch shift in semitones, -5 to +5. Positive = up.
 
-.PARAMETER Normalize
-    Opt-in: peak-normalize each file to -TargetPeakDb (default -1 dBFS) after pitching.
-
 .PARAMETER Limit
     Process only the first N files (for a quick A/B test). 0 = all files.
 
 .EXAMPLE
     .\Process-SoundMod.ps1 -Semitones 1
     .\Process-SoundMod.ps1 -Semitones 1 -Source "C:\Mods\Sounds" -Limit 1
-    .\Process-SoundMod.ps1 -Semitones -1.5 -Normalize
+    .\Process-SoundMod.ps1 -Semitones -1.5
 
 .NOTES
     Requires ffmpeg and ffprobe on PATH (https://ffmpeg.org or `winget install ffmpeg`).
@@ -36,28 +38,50 @@ param(
     [ValidateRange(-5.0, 5.0)]
     [double]$Semitones,
 
-    [string]$Source = ".\Sounds",
+    [string]$Source = "",
     [string]$Dest   = "",
-
-    [switch]$Normalize,
-    [double]$TargetPeakDb = -1,
 
     [string[]]$ExcludeDirs = @("UI", "Ragdoll", "THESE WOULD GO IN RAGDOLL"),
     [int]$Limit = 0
 )
 
+function Write-Fatal {
+    param([string]$Title, [string[]]$Detail)
+    Write-Host ""
+    Write-Host "  $Title" -ForegroundColor Red
+    Write-Host ""
+    foreach ($line in $Detail) { Write-Host "  $line" -ForegroundColor Gray }
+    Write-Host ""
+    exit 1
+}
+
 # --- sanity checks --------------------------------------------------------
+# Default pack sits next to the script, not in the current working directory.
+if (-not $Source) { $Source = Join-Path $PSScriptRoot "Sounds" }
+
+# Pack first: ffmpeg bootstrapping can pull a ~170 MB download, and it should
+# not happen before we know there is anything to process.
+if (-not (Test-Path $Source -PathType Container)) {
+    Write-Fatal "No sound pack found." @(
+        "Looked for: $Source"
+        ""
+        "Put your Skater XL sound pack in a folder named 'Sounds' next to this"
+        "script, or pass -Source ""C:\path\to\Sounds"". Sound packs are not"
+        "included in this repo."
+    )
+}
+$Source = (Resolve-Path $Source).Path.TrimEnd('\')
+
 $bootstrap = Join-Path $PSScriptRoot "bootstrap-ffmpeg.ps1"
 if (Test-Path $bootstrap) { . $bootstrap; Initialize-FFmpeg }
 foreach ($tool in "ffmpeg", "ffprobe") {
     if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
-        throw "$tool not found on PATH. Install ffmpeg first."
+        Write-Fatal "$tool not found." @(
+            "The automatic download did not leave a working ffmpeg behind."
+            "Install it manually and rerun:  winget install ffmpeg"
+        )
     }
 }
-if (-not (Test-Path $Source -PathType Container)) {
-    throw "Source folder not found: $Source"
-}
-$Source = (Resolve-Path $Source).Path.TrimEnd('\')
 if (-not $Dest) { $Dest = $Source + "_processed" }
 
 # --- collect files --------------------------------------------------------
@@ -76,7 +100,6 @@ $ratio = [math]::Pow(2, $Semitones / 12)
 Write-Host ""
 Write-Host "Files to process : $(@($targets).Count)"
 Write-Host "Pitch shift      : $Semitones st (rate x $([math]::Round($ratio, 4)))"
-Write-Host "Normalize        : $(if ($Normalize) { "$TargetPeakDb dBFS peak" } else { 'off' })"
 Write-Host "Output           : $Dest"
 Write-Host ""
 
@@ -116,25 +139,12 @@ foreach ($f in $targets) {
         $chain += "asetrate=$newRate"
         $chain += "aresample=$sr"
     }
-    if (@($chain).Count -eq 0) { $chain += "anull" }   # 0 st, no normalize: pass-through
+    if (@($chain).Count -eq 0) { $chain += "anull" }   # 0 st: pass-through
     $af = $chain -join ","
 
-    $afFinal = $af
-    if ($Normalize) {
-        # extra pass: measure post-pitch peak, then apply exact gain to hit target
-        $detect = (& ffmpeg -hide_banner -nostats -i $f.FullName `
-            -af "$af,volumedetect" -f null - 2>&1) | Out-String
-        $m = [regex]::Match($detect, "max_volume:\s*(-?[\d.]+)\s*dB")
-        if ($m.Success) {
-            $gain = [math]::Round($TargetPeakDb - [double]$m.Groups[1].Value, 2)
-            $afFinal = "$af,volume=${gain}dB"
-        }
-    }
-
-    # pass 2: render
     $codecArgs = Get-CodecArgs $codec $f.Extension.ToLower()
     & ffmpeg -hide_banner -loglevel error -y -i $f.FullName `
-        -af $afFinal -ar $sr @codecArgs -- $outPath 2>&1 | Out-Null
+        -af $af -ar $sr @codecArgs -- $outPath 2>&1 | Out-Null
 
     if ($LASTEXITCODE -eq 0 -and (Test-Path $outPath)) {
         $done++

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1280px; height:720px; overflow:hidden; }
+  body {
+    background:#0f1114;
+    font-family:'Archivo', Arial, sans-serif; color:#e8e6e0;
+    position:relative;
+  }
+  /* grip-tape grain */
+  body::before { content:''; position:absolute; inset:0; opacity:.5;
+    background-image:
+      radial-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      radial-gradient(rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size:7px 7px, 11px 11px;
+    background-position:0 0, 4px 6px; }
+
+  .wrap { position:absolute; inset:0; display:flex; flex-direction:column;
+          align-items:center; justify-content:center; z-index:2; }
+  .kicker { font-size:21px; letter-spacing:.5em; color:#8b8f98; font-weight:600;
+            margin-bottom:26px; text-indent:.5em; }
+  h1 { font-family:'Archivo Black','Arial Black',sans-serif;
+       font-size:99px; line-height:.9; text-align:center; letter-spacing:-0.005em;
+       white-space:nowrap; }
+  h1 .amber { color:#f5a524; }
+
+  /* single rising pitch stroke under the title */
+  svg.rise { margin-top:44px; display:block; }
+  .tagline { margin-top:30px; font-size:24px; color:#b9bcc4; font-weight:500; }
+  .tagline b { color:#f5a524; font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="kicker">SKATER XL</div>
+    <h1>SOUNDMOD<span class="amber">TUNER</span></h1>
+    <svg class="rise" width="760" height="120" viewBox="0 0 760 120" fill="none">
+      <!-- flat reference line -->
+      <path d="M0 96 H760" stroke="#2b2f37" stroke-width="3"/>
+      <!-- pitch curve: flat, then sweeping up -->
+      <path d="M0 96 C 220 96, 400 92, 520 62 C 610 40, 680 22, 748 10"
+            stroke="#f5a524" stroke-width="9" stroke-linecap="round"/>
+      <!-- semitone tick marks along the curve -->
+      <circle cx="520" cy="62" r="9" fill="#f5a524"/>
+      <circle cx="638" cy="31" r="9" fill="#f5a524"/>
+      <circle cx="748" cy="10" r="9" fill="#f5a524"/>
+    </svg>
+    <div class="tagline">Per-category pitch for your whole sound pack &middot; <b>+3 st</b></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1280px; height:720px; overflow:hidden; }
+  body {
+    background:
+      radial-gradient(1200px 800px at 78% 30%, #232733 0%, #14161a 55%),
+      #14161a;
+    font-family:'Archivo', Arial, sans-serif;
+    position:relative; color:#e8e6e0;
+  }
+  /* ---- left: title block ---- */
+  .title { position:absolute; left:84px; top:170px; z-index:3; }
+  .kicker {
+    font-size:22px; letter-spacing:.42em; color:#8b8f98;
+    font-weight:600; margin-bottom:18px;
+  }
+  h1 {
+    font-family:'Archivo Black', 'Arial Black', sans-serif;
+    font-size:110px; line-height:.92; letter-spacing:-0.01em;
+  }
+  h1 .amber { color:#f5a524; }
+  .tag {
+    margin-top:26px; font-size:24px; font-weight:500; color:#b9bcc4;
+  }
+  .tag b { color:#f5a524; font-weight:600; }
+  /* ---- right: pitch-rising waveform ---- */
+  .wave { position:absolute; right:70px; top:110px; bottom:110px; width:430px;
+          display:flex; align-items:center; gap:7px; z-index:2; }
+  .bar { flex:1; border-radius:3px; background:#3a3f4b; }
+  .bar.hot { background:#f5a524; }
+  /* ---- slider motif under wave ---- */
+  .sliders { position:absolute; right:70px; bottom:64px; width:430px; z-index:3; }
+  .srow { display:flex; align-items:center; gap:14px; margin-top:16px; }
+  .track { flex:1; height:6px; border-radius:4px; background:#2b2f37; position:relative; }
+  .knob { position:absolute; top:50%; transform:translate(-50%,-50%);
+          width:22px; height:22px; border-radius:50%; background:#f5a524;
+          box-shadow:0 0 0 5px rgba(245,165,36,.18); }
+  .val { font-size:19px; font-weight:600; color:#f5a524; width:74px; text-align:right;
+         font-variant-numeric:tabular-nums; }
+  .val.zero { color:#8b8f98; }
+  .baseline { position:absolute; left:0; right:0; bottom:0; height:6px; background:#f5a524; }
+</style>
+</head>
+<body>
+  <div class="title">
+    <div class="kicker">SKATER XL SOUND MOD</div>
+    <h1>SOUNDMOD<br><span class="amber">TUNER</span></h1>
+    <div class="tag">Pitch every category <b>its own way</b></div>
+  </div>
+
+  <div class="wave" id="wave"></div>
+
+  <div class="sliders">
+    <div class="srow"><div class="track"><div class="knob" style="left:72%"></div></div><div class="val">+3.0 st</div></div>
+    <div class="srow"><div class="track"><div class="knob" style="left:58%"></div></div><div class="val">+2.0 st</div></div>
+    <div class="srow"><div class="track"><div class="knob" style="left:50%"></div></div><div class="val zero">0.0 st</div></div>
+  </div>
+
+  <div class="baseline"></div>
+
+<script>
+  // rising-pitch waveform: bar heights follow a sine burst whose frequency climbs left->right
+  const wave = document.getElementById('wave');
+  const N = 46;
+  for (let i = 0; i < N; i++) {
+    const t = i / (N - 1);
+    const freq = 2 + t * 9;                       // pitch climbing
+    const env = 0.35 + 0.65 * Math.pow(t, 1.4);   // louder toward the right
+    const h = Math.abs(Math.sin(t * freq * Math.PI)) * env;
+    const bar = document.createElement('div');
+    bar.className = 'bar' + (t > 0.62 ? ' hot' : '');
+    bar.style.height = Math.max(6, Math.round(h * 420)) + 'px';
+    wave.appendChild(bar);
+  }
+</script>
+</body>
+</html>

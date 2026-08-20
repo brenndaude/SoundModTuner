@@ -11,3 +11,7 @@ bin/
 # local screenshots / images
 *.jpg
 *.png
+
+# ...except repo assets
+!thumbnail/*.png
+!docs/**/*.png
