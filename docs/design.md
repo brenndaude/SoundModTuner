@@ -1,6 +1,6 @@
 # SoundMod Tuner v2 — per-category pitch GUI
 
-Date: 2026-08-14 · Status: approved by Brenn (chat)
+Date: 2026-08-14 · Status: implemented (v1.2)
 
 ## Goal
 Per-category semitone control for the Skater XL sound pack, replacing the single
