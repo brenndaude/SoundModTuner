@@ -1,5 +1,7 @@
 # SoundModTuner
 
+![SoundModTuner](thumbnail/variant-b-ui.png)
+
 Batch tuning tools for Skater XL sound mod packs, built on ffmpeg. Pitch, EQ and
 level per sound category, while leaving menu (UI) and bail (Ragdoll) sounds
 untouched and keeping every file's format (codec, sample rate, channels, bit
@@ -134,3 +136,16 @@ Originals are never modified; everything is written to `Sounds_processed`.
 | `Process-SoundMod.ps1` | Global pitch-only CLI |
 | `bootstrap-ffmpeg.ps1` | First-launch portable ffmpeg download |
 | `tuner-settings.json` | Saved per-category settings (v1 files migrate automatically) |
+
+## How the audio chain works
+
+`AudioChain.ps1` builds one ffmpeg filter string per category, in a fixed order: **pitch, then EQ,
+then volume**. Pitch is a resample (`asetrate`, then back to the file's own rate), EQ is five biquads
+(low shelf, three peaking `equalizer` bands, high shelf) and volume sits last so the slider is a pure
+trim. The browser UI draws its EQ curve from the same biquad coefficients, so the curve on screen is
+the response ffmpeg applies. Peaks are measured with `astats` on a float pipeline, because
+`volumedetect` clamps at 0 dBFS and would hide an overshoot. Design notes: [`docs/design.md`](docs/design.md).
+
+## Licence
+
+MIT, see LICENSE. Sound packs are not included and keep their own licences.
